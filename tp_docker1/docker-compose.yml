@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./simpleapi
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  database:
+    build:
+      context: ./database
+    networks:
+      - app-network
+
+  httpd:
+    build:
+      context: ./serveur
+    ports:
+      - "8080:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+networks:
+  app-network:
+
+volumes:
+  db-data:
