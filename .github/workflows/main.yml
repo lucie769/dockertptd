@@ -1,4 +1,4 @@
-name: CI devops 2025
+name: CI DevOps 2025
 
 on:
   push:
@@ -15,7 +15,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: maven
       - name: Build and test with Maven
         run: mvn -f tp_docker1/simpleapi/pom.xml clean verify
 
@@ -29,42 +28,37 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-          cache: maven
-      - name: SonarCloud Analyze
+      - name: SonarCloud Analyze (Maven)
+        working-directory: ./tp_docker1/simpleapi
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: mvn -f tp_docker1/simpleapi/pom.xml verify sonar:sonar \
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
           -Dsonar.projectKey=lucie769_dockertptd \
           -Dsonar.organization=lucie769 \
-          -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${SONAR_TOKEN}
 
   build-and-push-docker-image:
     needs: sonar-cloud
     runs-on: ubuntu-24.04
-    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v4
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
           context: ./tp_docker1/simpleapi
-          push: true
-          tags: luciemoreau/my-backend:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/my-backend:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
       - name: Build and push database image
         uses: docker/build-push-action@v6
         with:
           context: ./tp_docker1/database
-          push: true
-          tags: luciemoreau/my-database:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/my-database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
       - name: Build and push httpd image
         uses: docker/build-push-action@v6
         with:
           context: ./tp_docker1/serveur
-          push: true
-          tags: luciemoreau/my-httpd:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/my-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
