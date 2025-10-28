@@ -20,7 +20,7 @@ jobs:
 
       #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn -f td_docker1/simpleapi/pom.xml clean verify
+        run: mvn -f tp_docker1/simpleapi/pom.xml clean verify
 
   build-and-push-docker-image:
     needs: test-backend
@@ -36,20 +36,20 @@ jobs:
       - name: Build image and push backend
         uses: docker/build-push-action@v6
         with:
-          context: ./td_docker1/simpleapi
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+          context: ./tp_docker1/simpleapi
+          tags: luciemoreau/my-backend:latest
           push: true
 
       - name: Build image and push database
         uses: docker/build-push-action@v6
         with:
-          context: ./td_docker1/database
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
-          push: ${{ github.ref == 'refs/heads/main' }}
+          context: ./tp_docker1/database
+          tags: luciemoreau/my-database:latest
+          push: true
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v6
         with:
-          context: ./td_docker1/serveur
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-http-server:latest
-          push: ${{ github.ref == 'refs/heads/main' }}
+          context: ./tp_docker1/serveur
+          tags: luciemoreau/my-httpd:latest
+          push: true
