@@ -2,6 +2,8 @@ services:
   backend:
     build:
       context: ./simpleapi
+    env_file:
+      - .env
     networks:
       - app-network
     depends_on:
@@ -10,21 +12,25 @@ services:
   database:
     build:
       context: ./database
+    env_file:
+      - .env
     networks:
       - app-network
+      - proxy-network
 
   httpd:
     build:
       context: ./serveur
     ports:
-      - "8080:80"
+      - "80:80"
     networks:
-      - app-network
+      - proxy-network
     depends_on:
       - backend
 
 networks:
   app-network:
+  proxy-network:
 
 volumes:
   db-data:
