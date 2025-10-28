@@ -20,4 +20,4 @@ jobs:
 
       #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn -f ./simpleapi/pom.xml clean verify
+        run: mvn -f ./tp_docker1/simpleapi/pom.xml clean verify
