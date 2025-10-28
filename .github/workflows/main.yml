@@ -20,7 +20,7 @@ jobs:
 
       #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn -f td_docker2/simple-api/pom.xml clean verify
+        run: mvn -f td_docker1/simpleapi/pom.xml clean verify
 
   build-and-push-docker-image:
     needs: test-backend
