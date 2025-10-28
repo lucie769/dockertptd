@@ -34,14 +34,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn -B verify --file ./tp_docker1/simpleapi/pom.xml
-          mvn -B sonar:sonar \
+          mvn -B -ntp verify
+          mvn -B -ntp org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=lucie769_dockertptd \
             -Dsonar.organization=lucie769 \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            --file ./tp_docker1/simpleapi/pom.xml
-
+            -Dsonar.login=${SONAR_TOKEN}
 
   build-and-push-docker-image:
     needs: sonar-cloud
