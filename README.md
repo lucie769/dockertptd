@@ -185,4 +185,5 @@ Ansible permet de déployer des conteneurs Docker sur un serveur distant avec le
 
 
 **3-4 Is it really safe to deploy automatically every new image on the hub ? explain. What can I do to make it more secure?**
+
 Le déploiement automatique des images sur le registre peut être risqué si elles n’ont pas été testées ou validées. Pour sécuriser ce processus, il faut ajouter des tests, limiter les déclenchements aux branches fiables et utiliser des images sûres et bien identifiées.
