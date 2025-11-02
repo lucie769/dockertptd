@@ -75,35 +75,43 @@ Docker Compose permet de définir et lancer plusieurs conteneurs en une seule co
 
 
 **1-9 Document your publication commands and published images in dockerhub.**
+
 - Se connecter à Docker Hub :docker login
 - Prépare l’image pour qu’elle soit associée au bon compte Docker Hub :docker tag lucienorecaumy-backend lucienorecaumy/lucienorecaumy-backend
 - Pousser l’image vers Docker Hub :docker push lucienorecaumy/lucienorecaumy-backend
 
 
 **1-10 Why do we put our images into an online repo?**
+
 On met nos images Docker dans un dépôt en ligne sur Docker Hub pour pouvoir les partager, réutiliser et déployer facilement depuis n’importe où, tout en centralisant et versionnant les images pour le projet.
 
 
+   
+
 **TP part 02 - Github Actions**
-1-1 For which reason is it better to run the container with a flag -e to give the environment variables rather than put them directly in the Dockerfile?
-1-2 Why do we need a volume to be attached to our postgres container?
-1-3 Document your database container essentials: commands and Dockerfile.
-1-4 Why do we need a multistage build? And explain each step of this dockerfile.
-1-5 Why do we need a reverse proxy?
-1-6 Why is docker-compose so important?
-1-7 Document docker-compose most important commands.
-1-8 Document your docker-compose file.
-1-9 Document your publication commands and published images in dockerhub.
-1-10 Why do we put our images into an online repo?
+
+**2-1 What are testcontainers?**
+
+Les Testcontainers sont des bibliothèques Java qui lancent de vrais conteneurs Docker pendant les tests, permettant de simuler des dépendances comme une base de données sans les installer localement.
+
+
+**2-2 For what purpose do we need to use secured variables ?**
+
+Les variables sécurisées protègent les informations sensibles (mots de passe, jetons) en les cachant dans le code, ce qui garantit qu’elles ne sont jamais publiées accidentellement tout en permettant l’automatisation avec GitHub Actions.
+
+
+**2-3 Why did we put needs: build-and-test-backend on this job? Maybe try without this and you will see!**
+
+On ajoute needs: build-and-test-backend pour que ce job ne démarre que si les tests du backend ont réussi, afin d’éviter de construire une image Docker avec un code cassé qui casserait le déploiement.
+
+
+
+**2-4 For what purpose do we need to push docker images?**
+
+Nous publions nos images Docker pour que d’autres machines puissent récupérer la même version de l’application et la déployer facilement et de façon fiable sans reconstruire le projet.
+
+
+
 
 **TP part 03 - Ansible**
-1-1 For which reason is it better to run the container with a flag -e to give the environment variables rather than put them directly in the Dockerfile?
-1-2 Why do we need a volume to be attached to our postgres container?
-1-3 Document your database container essentials: commands and Dockerfile.
-1-4 Why do we need a multistage build? And explain each step of this dockerfile.
-1-5 Why do we need a reverse proxy?
-1-6 Why is docker-compose so important?
-1-7 Document docker-compose most important commands.
-1-8 Document your docker-compose file.
-1-9 Document your publication commands and published images in dockerhub.
-1-10 Why do we put our images into an online repo?
+
