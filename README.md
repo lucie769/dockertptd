@@ -127,6 +127,7 @@ Nous publions nos images Docker pour que d’autres machines puissent récupére
 
   
 **3-2 Document your playbook**
+
 Le playbook Ansible installe Docker sur un serveur distant, configure les dépendances nécessaires et prépare un environnement Python pour utiliser le SDK Docker, sur tous les hôtes de l’inventaire.
 -Installer les paquets nécessaires :- name: Install required packages
       apt:
