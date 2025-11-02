@@ -115,3 +115,73 @@ Nous publions nos images Docker pour que d’autres machines puissent récupére
 
 **TP part 03 - Ansible**
 
+**3-1 Document your inventory and base commands**
+
+- ansible_user : nom d’utilisateur utilisé pour se connecter au serveur
+- ansible_ssh_private_key_file : chemin vers ta clé privée SSH pour l’authentification
+- prod : groupe d’hôtes contenant ton serveur distant
+
+- ansible all -i inventories/setup.yml -m ping :Vérifie la connectivité avec le serveur distant
+- ansible all -i inventories/setup.yml -m setup :Récupère les faits système
+- ansible all -i inventories/setup.yml -m apt -a "name=apache2 state=absent" --become :upprime Apache2 du serveur en forçant son état à "absent"
+
+  
+**3-2 Document your playbook**
+Le playbook Ansible installe Docker sur un serveur distant, configure les dépendances nécessaires et prépare un environnement Python pour utiliser le SDK Docker, sur tous les hôtes de l’inventaire.
+-Installer les paquets nécessaires :- name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          - python3-venv
+        state: latest
+        update_cache: yes
+ - Ajouter la clé GPG officielle de Docker : name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+- Ajouter le dépôt Docker :name: Add Docker APT repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_facts['distribution_release'] }} stable"
+        state: present
+        update_cache: yes
+- Installer Docker :name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+- Installer Python3 et pip3 :name: Install Python3 and pip3
+      apt:
+        name:
+          - python3
+          - python3-pip
+        state: present
+- Créer un environnement virtuel pour le SDK Docker :name: Create a virtual environment for Docker SDK
+      command: python3 -m venv /opt/docker_venv
+      args:
+        creates: /opt/docker_venv
+- Installer le SDK Docker dans l’environnement virtuel :name: Install Docker SDK for Python in virtual environment
+      command: /opt/docker_venv/bin/pip install docker
+- ’assurer que Docker est en cours d’exécution :name: Make sure Docker is running
+      service:
+        name: docker
+        state: started
+      tags: docker
+  
+
+**3-3 Document your docker_container tasks configuration.**
+
+Ansible permet de déployer des conteneurs Docker sur un serveur distant avec le module docker_container. Chaque tâche définit le nom du conteneur, l’image, les ports, les variables d’environnement, les réseaux Docker et les dépendances éventuelles.
+
+- Création du réseau Docker : création du réseau app-network pour permettre aux conteneurs (base de données, backend, proxy) de communiquer de manière sécurisée et isolée. L’interpréteur Python est précisé pour assurer la compatibilité avec le module Docker d’Ansible.
+- Installation de Docker avec Ansible : installation de Docker sur le serveur distant selon les recommandations officielles Debian, ajout de la clé GPG et du dépôt Docker, installation des paquets nécessaires et configuration d’un environnement Python pour le SDK Docker. Le service Docker est vérifié pour garantir une installation propre, reproductible et prête au déploiement.
+- Installation simplifiée de Docker : installation rapide via le paquet docker.io des dépôts officiels Debian/Ubuntu, en mettant à jour le cache APT pour utiliser la dernière version. Moins personnalisable que l’installation via le dépôt officiel Docker.
+- Déploiement du backend : lancement du conteneur luciemoreau/my-backend:latest connecté au réseau app-network pour communiquer avec la base de données et le proxy HTTP.
+- Déploiement de la base de données : lancement du conteneur PostgreSQL luciemoreau/my-database:latest connecté à app-network, avec injection dynamique des variables d’environnement (nom de la base, utilisateur, mot de passe).
+- Déploiement du proxy HTTP : lancement du conteneur luciemoreau/my-httpd:latest, connecté à app-network et exposant le port 80 comme point d’entrée vers les services internes.
+
+
+**3-4 Is it really safe to deploy automatically every new image on the hub ? explain. What can I do to make it more secure?**
+Le déploiement automatique des images sur le registre peut être risqué si elles n’ont pas été testées ou validées. Pour sécuriser ce processus, il faut ajouter des tests, limiter les déclenchements aux branches fiables et utiliser des images sûres et bien identifiées.
